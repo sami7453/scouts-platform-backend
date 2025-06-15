@@ -1,0 +1,8 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force Git to track empty folders by adding a .gitkeep file
+.gitkeep export-ignore
+
+# Force Git to track empty files
+*.empty -diff -merge text
