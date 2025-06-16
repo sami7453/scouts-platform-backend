@@ -2,8 +2,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
+const helmet = require('helmet');
 const path = require('path');
+const rateLimit = require('./middleware/rateLimit');
 
 const authRoutes = require('./routes/auth');
 const reportRoutes = require('./routes/reports');
@@ -12,6 +13,8 @@ const webhookRoutes = require('./routes/webhook');
 const { verifyToken } = require('./middleware/auth');
 
 const app = express();
+app.use(helmet());
+app.use(rateLimit);
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -24,10 +27,13 @@ app.use('/webhook', webhookRoutes);
 app.use('/api/scouts', require('./routes/scouts'));
 app.use('/api/clubs', require('./routes/clubs'));
 
-
 // Protected routes
 app.use('/api/reports', verifyToken, reportRoutes);
 app.use('/api/sales', verifyToken, saleRoutes);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
