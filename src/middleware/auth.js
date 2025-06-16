@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 function verifyToken(req, res, next) {
-  const header = req.headers['authorization'];
+  const header = req.headers.authorization;
   if (!header) return res.status(401).json({ error: 'Token manquant' });
   const token = header.split(' ')[1];
   try {

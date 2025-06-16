@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "lint": "eslint \"src/**/*.js\"",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -23,5 +25,12 @@
     "nodemon": "^3.1.10",
     "pg": "^8.16.0",
     "stripe": "^18.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "jest": "^30.0.0",
+    "supertest": "^7.1.1"
   }
 }

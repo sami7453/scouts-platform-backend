@@ -1,5 +1,6 @@
 // ----- File: src/services/reportService.js -----
 const reportModel = require('../models/reportModel');
+const db = require('../db');
 
 async function createReport(data, fileUrl, scoutId) {
   const report = await reportModel.insertReport({
@@ -13,7 +14,7 @@ async function createReport(data, fileUrl, scoutId) {
     current_league: data.current_league,
     content_text: data.content_text || null,
     pdf_url: fileUrl,
-    price_cents: parseInt(data.price_cents, 10)
+    price_cents: parseInt(data.price_cents, 10),
   });
   return report;
 }
@@ -32,9 +33,10 @@ async function listReports(filters) {
     league: 'current_league',
     nationality: 'nationality',
     position: 'position',
-    age: 'age'
+    age: 'age',
   };
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const [param, column] of Object.entries(mapping)) {
     if (filters[param]) {
       if (param === 'age') {
@@ -44,15 +46,15 @@ async function listReports(filters) {
         where.push(`${column} ILIKE $${idx}`);
         values.push(`%${filters[param]}%`);
       }
+      // eslint-disable-next-line no-plusplus
       idx++;
     }
   }
 
-  if (where.length) base += ' WHERE ' + where.join(' AND ');
+  if (where.length) base += ` WHERE ${where.join(' AND ')}`;
   const res = await db.query(base, values);
   return res.rows;
 }
-
 
 async function getReport(id) {
   const rep = await reportModel.getReportById(id);
@@ -68,4 +70,6 @@ async function deleteReport(id) {
   return reportModel.deleteReportById(id);
 }
 
-module.exports = { createReport, listReports, getReport, updateReport, deleteReport };
+module.exports = {
+  createReport, listReports, getReport, updateReport, deleteReport,
+};

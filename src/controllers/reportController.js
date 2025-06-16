@@ -1,5 +1,8 @@
 const reportService = require('../services/reportService');
 
+/**
+ * Create a new scouting report
+ */
 exports.create = async (req, res) => {
   try {
     const fileUrl = req.file ? `/uploads/${req.file.filename}` : null;
@@ -10,12 +13,18 @@ exports.create = async (req, res) => {
   }
 };
 
+/**
+ * List reports with optional filters
+ */
 exports.list = async (req, res) => {
   const filters = req.query;
   const reports = await reportService.listReports(filters);
   res.json(reports);
 };
 
+/**
+ * Retrieve a single report by id
+ */
 exports.get = async (req, res) => {
   try {
     const report = await reportService.getReport(parseInt(req.params.id, 10));
@@ -25,6 +34,9 @@ exports.get = async (req, res) => {
   }
 };
 
+/**
+ * Update an existing report
+ */
 exports.update = async (req, res) => {
   try {
     const fields = req.body;
@@ -35,6 +47,9 @@ exports.update = async (req, res) => {
   }
 };
 
+/**
+ * Delete a report
+ */
 exports.remove = async (req, res) => {
   try {
     await reportService.deleteReport(parseInt(req.params.id, 10));

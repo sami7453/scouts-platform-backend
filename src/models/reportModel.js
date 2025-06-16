@@ -5,7 +5,7 @@ async function insertReport(report) {
   const {
     scout_id, player_firstname, player_lastname,
     position, nationality, age, current_club,
-    current_league, content_text, pdf_url, price_cents
+    current_league, content_text, pdf_url, price_cents,
   } = report;
   const res = await db.query(
     `INSERT INTO reports(
@@ -16,7 +16,7 @@ async function insertReport(report) {
      RETURNING *`,
     [scout_id, player_firstname, player_lastname,
       position, nationality, age, current_club,
-      current_league, content_text, pdf_url, price_cents]
+      current_league, content_text, pdf_url, price_cents],
   );
   return res.rows[0];
 }
@@ -27,14 +27,16 @@ async function getAllReports(filters) {
   const where = [];
   const values = [];
   let idx = 1;
+  // eslint-disable-next-line no-restricted-syntax
   for (const key of ['position', 'nationality', 'age', 'current_league']) {
     if (filters[key]) {
       where.push(`${key} = $${idx}`);
       values.push(filters[key]);
+      // eslint-disable-next-line no-plusplus
       idx++;
     }
   }
-  if (where.length) base += ' WHERE ' + where.join(' AND ');
+  if (where.length) base += ` WHERE ${where.join(' AND ')}`;
   const res = await db.query(base, values);
   return res.rows;
 }
@@ -47,11 +49,11 @@ async function getReportById(id) {
 async function updateReportById(id, fields) {
   const keys = Object.keys(fields);
   const sets = keys.map((k, i) => `${k} = $${i + 1}`);
-  const values = keys.map(k => fields[k]);
+  const values = keys.map((k) => fields[k]);
   values.push(id);
   const res = await db.query(
     `UPDATE reports SET ${sets.join(', ')} WHERE id = $${keys.length + 1} RETURNING *`,
-    values
+    values,
   );
   return res.rows[0];
 }
@@ -60,4 +62,6 @@ async function deleteReportById(id) {
   await db.query('DELETE FROM reports WHERE id = $1', [id]);
 }
 
-module.exports = { insertReport, getAllReports, getReportById, updateReportById, deleteReportById };
+module.exports = {
+  insertReport, getAllReports, getReportById, updateReportById, deleteReportById,
+};
