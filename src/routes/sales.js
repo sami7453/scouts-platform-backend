@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const { body } = require('express-validator');
-const { checkout, history } = require('../controllers/saleController');
+const { checkout, historyForClub, historyForScout } = require('../controllers/saleController');
 const validate = require('../middleware/validate');
 
 router.post(
@@ -11,6 +11,7 @@ router.post(
   validate,
   checkout,
 );
-router.get('/history', history);
+router.get('/history', historyForClub);
+router.get('/scout', historyForScout);
 
 module.exports = router;

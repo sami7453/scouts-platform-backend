@@ -7,7 +7,8 @@ jest.mock('../src/services/saleService');
 const saleService = require('../src/services/saleService');
 
 saleService.createCheckoutSession.mockResolvedValue({ url: 'http://stripe' });
-saleService.getPurchasesHistory.mockResolvedValue([]);
+saleService.getClubSalesHistory.mockResolvedValue([]);
+saleService.getScoutRevenueHistory.mockResolvedValue([]);
 saleService.handleWebhook.mockResolvedValue({});
 
 const token = jwt.sign({ id: 2 }, 'testsecret');
@@ -18,6 +19,20 @@ describe('Sales routes', () => {
       .post('/api/sales/checkout')
       .set('Authorization', `Bearer ${token}`)
       .send({ reportId: 1 });
+    expect(res.statusCode).toBe(200);
+  });
+
+  test('history for club', async () => {
+    const res = await request(app)
+      .get('/api/sales/history')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toBe(200);
+  });
+
+  test('history for scout', async () => {
+    const res = await request(app)
+      .get('/api/sales/scout')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.statusCode).toBe(200);
   });
 
