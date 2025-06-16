@@ -5,7 +5,10 @@ const saleService = require('../services/saleService');
  */
 exports.checkout = async (req, res) => {
   try {
-    const session = await saleService.createCheckoutSession(req.body.reportId, req.user.id);
+    const session = await saleService.createCheckoutSession(
+      req.body.reportId,
+      req.user.id,
+    );
     res.json({ url: session.url });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -15,7 +18,12 @@ exports.checkout = async (req, res) => {
 /**
  * Retrieve purchases history for a club
  */
-exports.history = async (req, res) => {
-  const history = await saleService.getPurchasesHistory(req.user.id);
+exports.historyForClub = async (req, res) => {
+  const history = await saleService.getClubSalesHistory(req.user.id);
   res.json(history);
+};
+
+exports.historyForScout = async (req, res) => {
+  const payouts = await saleService.getScoutRevenueHistory(req.user.id);
+  res.json(payouts);
 };
