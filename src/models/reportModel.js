@@ -1,56 +1,63 @@
+// ----- File: src/models/reportModel.js -----
 const db = require('../db');
 
-async function createReport(data) {
+async function insertReport(report) {
   const {
-    scoutId,
-    playerFirstname,
-    playerLastname,
-    position,
-    nationality,
-    age,
-    currentClub,
-    currentLeague,
-    contentText,
-    pdfUrl,
-    priceCents
-  } = data;
-  const result = await db.query(
-    `INSERT INTO reports (scout_id, player_firstname, player_lastname, position, nationality, age, current_club, current_league, content_text, pdf_url, price_cents)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-    [scoutId, playerFirstname, playerLastname, position, nationality, age, currentClub, currentLeague, contentText, pdfUrl, priceCents]
+    scout_id, player_firstname, player_lastname,
+    position, nationality, age, current_club,
+    current_league, content_text, pdf_url, price_cents
+  } = report;
+  const res = await db.query(
+    `INSERT INTO reports(
+       scout_id, player_firstname, player_lastname,
+       position, nationality, age, current_club,
+       current_league, content_text, pdf_url, price_cents
+     ) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+     RETURNING *`,
+    [scout_id, player_firstname, player_lastname,
+      position, nationality, age, current_club,
+      current_league, content_text, pdf_url, price_cents]
   );
-  return result.rows[0];
+  return res.rows[0];
 }
 
-async function listReports() {
-  const result = await db.query('SELECT * FROM reports ORDER BY created_at DESC');
-  return result.rows;
-}
-
-async function findReportById(id) {
-  const result = await db.query('SELECT * FROM reports WHERE id=$1', [id]);
-  return result.rows[0];
-}
-
-async function updateReport(id, data) {
-  const fields = [];
+async function getAllReports(filters) {
+  // filters: { position, nationality, age, current_league }
+  let base = 'SELECT * FROM reports';
+  const where = [];
   const values = [];
   let idx = 1;
-  for (const [key, value] of Object.entries(data)) {
-    fields.push(`${key}=$${idx}`);
-    values.push(value);
-    idx++;
+  for (const key of ['position', 'nationality', 'age', 'current_league']) {
+    if (filters[key]) {
+      where.push(`${key} = $${idx}`);
+      values.push(filters[key]);
+      idx++;
+    }
   }
+  if (where.length) base += ' WHERE ' + where.join(' AND ');
+  const res = await db.query(base, values);
+  return res.rows;
+}
+
+async function getReportById(id) {
+  const res = await db.query('SELECT * FROM reports WHERE id = $1', [id]);
+  return res.rows[0];
+}
+
+async function updateReportById(id, fields) {
+  const keys = Object.keys(fields);
+  const sets = keys.map((k, i) => `${k} = $${i + 1}`);
+  const values = keys.map(k => fields[k]);
   values.push(id);
-  const result = await db.query(
-    `UPDATE reports SET ${fields.join(', ')} WHERE id=$${idx} RETURNING *`,
+  const res = await db.query(
+    `UPDATE reports SET ${sets.join(', ')} WHERE id = $${keys.length + 1} RETURNING *`,
     values
   );
-  return result.rows[0];
+  return res.rows[0];
 }
 
-async function deleteReport(id) {
-  await db.query('DELETE FROM reports WHERE id=$1', [id]);
+async function deleteReportById(id) {
+  await db.query('DELETE FROM reports WHERE id = $1', [id]);
 }
 
-module.exports = { createReport, listReports, findReportById, updateReport, deleteReport };
+module.exports = { insertReport, getAllReports, getReportById, updateReportById, deleteReportById };

@@ -1,25 +1,10 @@
 const express = require('express');
-const { body } = require('express-validator');
-const validate = require('../middleware/validate');
-const authController = require('../controllers/authController');
-
 const router = express.Router();
+const { register, login, profile } = require('../controllers/authController');
+const { verifyToken } = require('../middleware/auth');
 
-router.post('/register',
-  body('email').isEmail(),
-  body('password').isLength({ min: 6 }),
-  body('role').isIn(['scout','club','admin']),
-  validate,
-  authController.register
-);
-
-router.post('/login',
-  body('email').isEmail(),
-  body('password').exists(),
-  validate,
-  authController.login
-);
-
-router.get('/profile', authController.profile);
+router.post('/register', register);
+router.post('/login', login);
+router.get('/profile', verifyToken, profile);
 
 module.exports = router;

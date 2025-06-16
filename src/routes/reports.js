@@ -1,23 +1,21 @@
 const express = require('express');
 const multer = require('multer');
-const { body } = require('express-validator');
-const validate = require('../middleware/validate');
-const reportController = require('../controllers/reportController');
+const path = require('path');
+const {
+  create, list, get, update, remove
+} = require('../controllers/reportController');
 
-const upload = multer();
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, '../../uploads'),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+const upload = multer({ storage });
+
 const router = express.Router();
-
-router.get('/', reportController.list);
-router.post('/',
-  upload.single('pdf'),
-  body('playerFirstname').notEmpty(),
-  body('playerLastname').notEmpty(),
-  body('priceCents').isInt({ min: 0 }),
-  validate,
-  reportController.create
-);
-router.get('/:id', reportController.get);
-router.put('/:id', reportController.update);
-router.delete('/:id', reportController.remove);
+router.post('/', upload.single('pdf'), create);
+router.get('/', list);
+router.get('/:id', get);
+router.put('/:id', update);
+router.delete('/:id', remove);
 
 module.exports = router;

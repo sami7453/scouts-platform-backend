@@ -1,20 +1,18 @@
+// ----- File: src/middleware/auth.js -----
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config');
-
-function generateToken(payload) {
-  return jwt.sign(payload, jwtSecret, { expiresIn: '12h' });
-}
+require('dotenv').config();
 
 function verifyToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader) return res.status(401).json({ message: 'Missing token' });
-  const token = authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Invalid token format' });
-  jwt.verify(token, jwtSecret, (err, decoded) => {
-    if (err) return res.status(401).json({ message: 'Invalid token' });
-    req.user = decoded;
+  const header = req.headers['authorization'];
+  if (!header) return res.status(401).json({ error: 'Token manquant' });
+  const token = header.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = payload;
     next();
-  });
+  } catch (err) {
+    return res.status(403).json({ error: 'Token invalide' });
+  }
 }
 
-module.exports = { generateToken, verifyToken };
+module.exports = { verifyToken };
