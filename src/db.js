@@ -1,12 +1,18 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 /**
- * Basic query helper and helper to obtain a client for transactions.
+ * Pour exécuter des transactions manuelles (BEGIN/COMMIT/ROLLBACK).
  */
+async function getClient() {
+  return pool.connect();
+}
+
 module.exports = {
   query: (text, params) => pool.query(text, params),
-  /** Return a dedicated client for transaction usage */
-  getClient: () => pool.connect(),
+  getClient,
 };

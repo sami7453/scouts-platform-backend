@@ -1,0 +1,747 @@
+{
+	"info": {
+		"_postman_id": "0dc94c69-9ae2-4644-ac3c-0b03889d3982",
+		"name": "Scouts Platform Complete API Tests",
+		"description": "Collection complète pour tester tous les endpoints du backend Scouts Platform, y compris authentication, onboarding Stripe Connect, gestion de profil, rapports, paiements, historiques de ventes et de payouts, webhooks et routes misc.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41403435"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Scout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"scout@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"scout\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Scout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('token', json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"scout@example4.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Club",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"club@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"club\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Club",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('token', json.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"club@example.com\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit user",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"nouvel@exemple.com\",\n  \"password\": \"NouveauPass123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stripe Onboarding",
+			"item": [
+				{
+					"name": "Create Onboarding Link",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('onboard_url', json.url);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/stripe/onboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"stripe",
+								"onboard"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile Update",
+			"item": [
+				{
+					"name": "Update Scout Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"bio\": \"Nouveau scout bio\", \"photo_url\": \"/uploads/scout.jpg\" }"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/scouts/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"scouts",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Club Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo_url",
+									"type": "file",
+									"src": "/Users/sami/Desktop/Capture d’écran 2025-06-11 à 12.35.07.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/clubs/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"clubs",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Create Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('report_id', json.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "player_firstname",
+									"value": "John",
+									"type": "text"
+								},
+								{
+									"key": "player_lastname",
+									"value": "Doe",
+									"type": "text"
+								},
+								{
+									"key": "position",
+									"value": "Forward",
+									"type": "text"
+								},
+								{
+									"key": "nationality",
+									"value": "USA",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "current_club",
+									"value": "FC Example",
+									"type": "text"
+								},
+								{
+									"key": "current_league",
+									"value": "Example League",
+									"type": "text"
+								},
+								{
+									"key": "price_cents",
+									"value": "2000",
+									"type": "text"
+								},
+								{
+									"key": "pdf",
+									"type": "file",
+									"src": "/path/to/sample.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports?firstname=John&lastname=Doe&club=FC Example",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "firstname",
+									"value": "John"
+								},
+								{
+									"key": "lastname",
+									"value": "Doe"
+								},
+								{
+									"key": "club",
+									"value": "FC Example"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{report_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"price_cents\": 2500 }"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{report_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Report",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{report_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{report_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sales",
+			"item": [
+				{
+					"name": "Create Checkout Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('checkout_url', json.url);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"reportId\": {{report_id}} }"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/sales/checkout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sales",
+								"checkout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sales History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/sales/history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sales",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payouts",
+			"item": [
+				{
+					"name": "Get Payouts History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/payouts/history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"payouts",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Webhook",
+			"item": [
+				{
+					"name": "Stripe Webhook Simulation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "stripe-signature",
+								"value": "{{stripe_sig}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"metadata\": {\n        \"reportId\": \"{{report_id}}\",\n        \"clubId\": \"1\",\n        \"amount_cents\": \"2000\",\n        \"commission_cents\": \"400\"\n      },\n      \"payment_intent\": \"pi_test_123\"\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/webhook",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Misc",
+			"item": [
+				{
+					"name": "Success Redirect",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/success",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"success"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Redirect",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "report_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "checkout_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "onboard_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "stripe_sig",
+			"value": "t=12345,v1=fakesignature",
+			"type": "string"
+		}
+	]
+}

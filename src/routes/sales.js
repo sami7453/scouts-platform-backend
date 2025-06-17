@@ -1,17 +1,20 @@
+// ----- File: src/routes/sales.js -----
 const express = require('express');
+const { body } = require('express-validator');
+const validate = require('../middleware/validate');
+const saleCtrl = require('../controllers/saleController');
 
 const router = express.Router();
-const { body } = require('express-validator');
-const { checkout, historyForClub, historyForScout } = require('../controllers/saleController');
-const validate = require('../middleware/validate');
 
+// Créer une session Stripe Checkout
 router.post(
   '/checkout',
-  [body('reportId').isInt()],
+  [body('reportId').isInt().withMessage('reportId doit être un entier')],
   validate,
-  checkout,
+  saleCtrl.checkout
 );
-router.get('/history', historyForClub);
-router.get('/scout', historyForScout);
+
+// Historique des achats (club)
+router.get('/history', saleCtrl.historyForClub);
 
 module.exports = router;

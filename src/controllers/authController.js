@@ -1,39 +1,51 @@
-const userService = require('../services/authService');
+// src/controllers/authController.js
+const authService = require('../services/authService');
 
 /**
- * Register new user
+ * POST /api/auth/register
  */
 exports.register = async (req, res) => {
-  const { email, password, role } = req.body;
   try {
-    const result = await userService.register({ email, password, role });
-    res.status(201).json(result);
+    const user = await authService.register(req.body);
+    res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
 /**
- * Authenticate user and return a token
+ * POST /api/auth/login
  */
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
   try {
-    const result = await userService.login({ email, password });
-    res.json(result);
+    const { token } = await authService.login(req.body);
+    res.json({ token });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(401).json({ error: err.message });
   }
 };
 
 /**
- * Get logged user profile
+ * GET /api/auth/profile
  */
 exports.profile = async (req, res) => {
   try {
-    const user = await userService.getProfile(req.user.id);
+    const user = await authService.getProfile(req.user.id);
     res.json(user);
   } catch (err) {
     res.status(404).json({ error: err.message });
+  }
+};
+
+/**
+ * PATCH /api/auth/profile
+ * Met à jour email et/ou mot de passe
+ */
+exports.updateProfile = async (req, res) => {
+  try {
+    const updated = await authService.updateProfile(req.user.id, req.body);
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };

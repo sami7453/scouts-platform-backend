@@ -6,7 +6,11 @@ const clubService = require('../services/clubService');
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const fields = req.body;
+    // Tous les champs textuels dans fields
+    const fields = { ...req.body };
+    if (req.file) {
+      fields.photo_url = `/uploads/${req.file.filename}`;
+    }
     const updated = await clubService.updateProfile(req.user.id, fields);
     res.json(updated);
   } catch (err) {
