@@ -1,16 +1,24 @@
 // ----- File: src/models/clubModel.js -----
 const db = require('../db');
 
-/**
- * Create an empty club profile for a newly registered user
- * @param {number} userId
- */
+
 async function createClubProfile(userId) {
   const res = await db.query(
-    `INSERT INTO clubs(user_id, photo_url, bio)
-         VALUES($1, NULL, NULL)
-         RETURNING *`,
-    [userId],
+    `INSERT INTO clubs(user_id, name, info, photo_url, bio)
+     VALUES($1, NULL, NULL, NULL, NULL)
+     RETURNING *`,
+    [userId]
+  );
+  return res.rows[0];
+}
+
+// ⬇️ transactionnel
+async function createClubProfileTx(userId, client = db) {
+  const res = await client.query(
+    `INSERT INTO clubs(user_id, name, info, photo_url, bio)
+     VALUES($1, NULL, NULL, NULL, NULL)
+     RETURNING *`,
+    [userId]
   );
   return res.rows[0];
 }
@@ -46,5 +54,6 @@ async function updateClubProfile(userId, fields) {
 module.exports = {
   createClubProfile,
   findClubByUserId,
+  createClubProfileTx,
   updateClubProfile,
 };

@@ -1,4 +1,4 @@
-const { findOtherUserByUserId, updateOtherUserProfile } = require('../models/other_userModel');
+const { findOtherUserByUserId, updateOtherUserProfile } = require('../models/otherUserModel');
 const userModel = require('../models/userModel');
 
 /**

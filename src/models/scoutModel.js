@@ -1,11 +1,20 @@
 // ----- File: src/models/scoutModel.js -----
 const db = require('../db');
 
-/**
- * Crée un profil minimal pour un scout (autopopulé à l'inscription).
- */
 async function createScoutProfile(userId) {
   const res = await db.query(
+    `INSERT INTO scouts(
+       user_id, photo_url, bio, vision_qa, test_report_url
+     ) VALUES($1, NULL, NULL, NULL, NULL)
+     RETURNING *`,
+    [userId]
+  );
+  return res.rows[0];
+}
+
+// ⬇️ transactionnel
+async function createScoutProfileTx(userId, client = db) {
+  const res = await client.query(
     `INSERT INTO scouts(
        user_id, photo_url, bio, vision_qa, test_report_url
      ) VALUES($1, NULL, NULL, NULL, NULL)
@@ -61,5 +70,6 @@ module.exports = {
   createScoutProfile,
   findScoutByUserId,
   updateScoutProfile,
-  setStripeAccountId
+  createScoutProfileTx,
+  setStripeAccountId,
 };

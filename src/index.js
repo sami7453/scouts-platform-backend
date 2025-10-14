@@ -15,7 +15,7 @@ const webhookRouter = require('./routes/webhook');
 const stripeRoutes = require('./routes/stripe');
 const availabilityRoutes = require('./routes/availability');
 const reservationRoutes = require('./routes/reservations');
-const otherUserRoutes = require('./routes/other_user');
+const otherUserRoutes = require('./routes/otherUser');
 const { verifyToken } = require('./middleware/auth');
 
 const app = express();
@@ -65,7 +65,7 @@ app.use('/api/reports', verifyToken, reportRoutes);
 app.use('/api/reports', verifyToken, reportsDownloadRoutes);
 
 // 7) Autres routes (selon ton design, publique ici)
-app.use('/api/other_user', otherUserRoutes);
+app.use('/api/otherUser', otherUserRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/reservations', reservationRoutes);
 

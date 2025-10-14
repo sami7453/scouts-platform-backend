@@ -1,5 +1,5 @@
 // ---- File: src/controllers/other_userController.js ----
-const otherUserService = require('../services/other_userService');
+const otherUserService = require('../services/otherUserService');
 
 /**
  * Update other_user profile

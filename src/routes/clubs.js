@@ -8,7 +8,7 @@ const validate = require('../middleware/validate');
 const multer = require('multer');
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 Mo max
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 Mo max
 });
 
 // Helpers Cloudflare R2
@@ -33,7 +33,7 @@ router.patch(
   [
     body('name').optional().isString(),
     body('info').optional().isString(),
-    body('bio').optional().isString()
+    body('bio').optional().isString(),
   ],
   async (req, res, next) => {
     try {
@@ -71,7 +71,7 @@ router.patch(
 router.get(
   '/profile/full',
   verifyToken,
-  fullProfile
+  fullProfile,
 );
 
 module.exports = router;

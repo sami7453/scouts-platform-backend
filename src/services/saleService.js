@@ -26,6 +26,8 @@ async function createCheckoutSession(reportId, clubUserId) {
     throw new Error('Compte Stripe du scout introuvable');
   }
 
+  const successUrl = `${process.env.FRONT_URL}/success?reportId=${reportId}&session_id={CHECKOUT_SESSION_ID}`;
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [{
@@ -37,7 +39,7 @@ async function createCheckoutSession(reportId, clubUserId) {
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: `${process.env.FRONT_URL}/success`,
+    success_url: successUrl,
     cancel_url: `${process.env.FRONT_URL}/cancel`,
     metadata: {
       reportId: String(reportId),
