@@ -13,7 +13,7 @@ router.post(
   [
     body('email').isEmail(),
     body('password').isLength({ min: 6 }),
-    body('role').isIn(['scout', 'club', 'admin'])
+    body('role').isIn(['scout', 'club', 'other_user', 'admin'])
   ],
   validate,
   authController.register

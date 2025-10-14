@@ -6,15 +6,16 @@ const clubService = require('../services/clubService');
  */
 exports.updateProfile = async (req, res) => {
   try {
-    // Tous les champs textuels dans fields
+    // Tous les champs textuels (dont éventuellement photo_url déjà présent)
     const fields = { ...req.body };
-    if (req.file) {
-      fields.photo_url = `/uploads/${req.file.filename}`;
-    }
+
+    // ⚠️ Plus besoin de gérer req.file ici. 
+    // La route d’upload se charge déjà d’injecter `photo_url` si un avatar a été envoyé.
+
     const updated = await clubService.updateProfile(req.user.id, fields);
-    res.json(updated);
+    return res.json(updated);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -24,8 +25,8 @@ exports.updateProfile = async (req, res) => {
 exports.fullProfile = async (req, res) => {
   try {
     const profile = await clubService.getProfile(req.user.id);
-    res.json(profile);
+    return res.json(profile);
   } catch (err) {
-    res.status(404).json({ error: err.message });
+    return res.status(404).json({ error: err.message });
   }
 };
