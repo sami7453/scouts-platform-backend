@@ -179,6 +179,5 @@ module.exports = {
   handleWebhook,
   getClubSalesHistory,
   getScoutRevenueHistory,
-  // (facultatif) expose pour tests manuels:
   generateAndAttachWatermarkedCopy,
 };

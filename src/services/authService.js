@@ -15,9 +15,17 @@ function sign(user) {
 
 /**
  * Enregistrement d'un nouvel utilisateur + profil lié dans une transaction.
- * Pour role=other_user, on attend aussi firstname/lastname.
+ * NOTE: firstname/lastname peuvent être undefined → on passe null (option B).
  */
-async function register({ email, password, role }) {
+async function register({ email, password, role, firstname, lastname }) {
+  console.log('[REGISTER] start', { email, role });
+  console.log('[REGISTER] function presence', {
+    createUserTx: !!userModel.createUserTx,
+    scoutTx: !!require('../models/scoutModel').createScoutProfileTx,
+    clubTx: !!require('../models/clubModel').createClubProfileTx,
+    otherTx: !!require('../models/otherUserModel').createOtherUserProfileTx,
+  });
+
   if (!['scout', 'club', 'other_user', 'admin'].includes(role)) {
     throw new Error('Rôle invalide');
   }
@@ -34,23 +42,37 @@ async function register({ email, password, role }) {
 
     if (role === 'scout') {
       await createScoutProfileTx(user.id, client);
+      console.log('[REGISTER] created profiles for role', role, 'userId', user.id);
     } else if (role === 'club') {
       await createClubProfileTx(user.id, client);
+      console.log('[REGISTER] created profiles for role', role, 'userId', user.id);
     } else if (role === 'other_user') {
-      // ⬇️ on laisse NULL possible (option B)
+      // ✅ bonne signature: on passe un objet + on laisse null si absent
       await createOtherUserProfileTx(user.id, client);
+      console.log('[REGISTER] created profiles for role', role, 'userId', user.id);
     }
-    // admin => pas de profil lié
+    // admin → pas de profil
 
     await client.query('COMMIT');
     return { id: user.id, email: user.email, role: user.role };
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('[REGISTER] error', err);
     throw err;
   } finally {
     client.release();
   }
 }
+
+module.exports = {
+  register,
+  // garde login/getProfile/updateProfile tels que déjà définis dans ton fichier
+  // login,
+  // getProfile,
+  // updateProfile,
+};
+
+
 
 
 async function login({ email, password }) {
@@ -79,5 +101,6 @@ async function updateProfile(id, data) {
   return userModel.updateUser(id, fields);
 }
 
-module.exports = { register, login, getProfile, updateProfile,
+module.exports = {
+  register, login, getProfile, updateProfile,
 };
