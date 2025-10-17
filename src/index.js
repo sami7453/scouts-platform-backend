@@ -7,35 +7,51 @@ const cors = require('cors');
 const app = express();
 
 /* ===================== CORS ===================== */
-
 const isProd = process.env.NODE_ENV === 'production';
+
+// whitelist for prod
 const ALLOWED_ORIGINS = [
-  'http://localhost:5173',      // utile pour tester le front en local
-  process.env.FRONT_URL,        // ex: https://ton-front.vercel.app
-  process.env.FRONT_URL_ALT,    // ex: https://preview-ton-front.vercel.app
+  'http://localhost:5173',
+  process.env.FRONT_URL,
+  process.env.FRONT_URL_ALT,
 ].filter(Boolean);
+
+// CORS first, before any routes
+app.use((req, res, next) => {
+  // quick debug for preflights
+  if (req.method === 'OPTIONS') {
+    console.log('[CORS] Preflight ->', {
+      path: req.path,
+      origin: req.headers.origin,
+      acrMethod: req.headers['access-control-request-method'],
+      acrHeaders: req.headers['access-control-request-headers'],
+    });
+  }
+  next();
+});
 
 app.use(cors({
   origin(origin, cb) {
-    // Autoriser Postman/cURL (origin === undefined)
+    // Allow non-browser clients (Postman/cURL) where Origin is undefined
     if (!origin) return cb(null, true);
 
     if (!isProd) {
-      // DEV: autorise tout
+      // DEV: allow everything
       return cb(null, true);
     }
-    // PROD: liste blanche stricte
-    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error(`Origin not allowed by CORS: ${origin}`));
+
+    // PROD: strict allowlist (case-insensitive)
+    const ok = ALLOWED_ORIGINS.some(o => o && o.toLowerCase() === origin.toLowerCase());
+    return ok ? cb(null, true) : cb(new Error(`Origin not allowed by CORS: ${origin}`));
   },
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+  // Do NOT pin allowedHeaders/methods — let the lib reflect the request
 }));
 
-// Répondre proprement aux preflights
+// Make sure preflights get answered
 app.options('*', cors());
-/* ================================================= */
+/* ================================================ */
+
 
 /** Option recommandé derrière un proxy (Railway/Vercel) */
 app.set('trust proxy', 1);
