@@ -87,7 +87,7 @@ const reservationRoutes = require('./routes/reservations');
 
 // ⚠️ Choisis le bon require selon ton fichier réel :
 //   - si le fichier s'appelle `routes/other_user.js` :
-const otherUserRoutes = require('./routes/other_user');
+const otherUserRoutes = require('./routes/otherUser');
 //   - s'il s'appelle `routes/otherUser.js`, alors remplace la ligne ci-dessus par :
 // const otherUserRoutes = require('./routes/otherUser');
 /* =========================================================== */
