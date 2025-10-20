@@ -9,47 +9,34 @@ const app = express();
 /* ===================== CORS ===================== */
 const isProd = process.env.NODE_ENV === 'production';
 
-// whitelist for prod
+// Liste des origines autorisées (whitelist)
 const ALLOWED_ORIGINS = [
-  'http://localhost:5173',
-  process.env.FRONT_URL,
-  process.env.FRONT_URL_ALT,
-].filter(Boolean);
+  'http://localhost:5173', // Pour le développement local de votre front
+  process.env.FRONT_URL,   // L'URL de production de votre front
+  process.env.FRONT_URL_ALT, // Une URL alternative si besoin
+].filter(Boolean); // Retire les entrées vides si les variables d'env ne sont pas définies
 
-// CORS first, before any routes
-app.use((req, res, next) => {
-  // quick debug for preflights
-  if (req.method === 'OPTIONS') {
-    console.log('[CORS] Preflight ->', {
-      path: req.path,
-      origin: req.headers.origin,
-      acrMethod: req.headers['access-control-request-method'],
-      acrHeaders: req.headers['access-control-request-headers'],
-    });
-  }
-  next();
-});
-
-app.use(cors({
+const corsOptions = {
   origin(origin, cb) {
-    // Allow non-browser clients (Postman/cURL) where Origin is undefined
-    if (!origin) return cb(null, true);
-
-    if (!isProd) {
-      // DEV: allow everything
+    // Autoriser les requêtes sans 'origin' (ex: Postman, apps mobiles, curl)
+    if (!origin) {
       return cb(null, true);
     }
-
-    // PROD: strict allowlist (case-insensitive)
-    const ok = ALLOWED_ORIGINS.some(o => o && o.toLowerCase() === origin.toLowerCase());
-    return ok ? cb(null, true) : cb(new Error(`Origin not allowed by CORS: ${origin}`));
+    
+    // Vérifier si l'origine de la requête est dans notre liste blanche
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      cb(null, true);
+    } else {
+      // Si non, rejeter la requête avec une erreur
+      cb(new Error(`L'origine ${origin} n'est pas autorisée par notre politique CORS.`));
+    }
   },
-  credentials: true,
-  // Do NOT pin allowedHeaders/methods — let the lib reflect the request
-}));
+  credentials: true, // Autorise l'envoi de cookies et d'en-têtes d'authentification
+};
 
-// Make sure preflights get answered
-app.options('*', cors());
+// Appliquer le middleware CORS UNE SEULE FOIS, avant toutes les autres routes.
+// Il gérera automatiquement les requêtes preflight (OPTIONS).
+app.use(cors(corsOptions));
 /* ================================================ */
 
 
@@ -84,12 +71,7 @@ const payoutRoutes = require('./routes/payouts');
 const stripeRoutes = require('./routes/stripe');
 const availabilityRoutes = require('./routes/availability');
 const reservationRoutes = require('./routes/reservations');
-
-// ⚠️ Choisis le bon require selon ton fichier réel :
-//   - si le fichier s'appelle `routes/other_user.js` :
 const otherUserRoutes = require('./routes/otherUser');
-//   - s'il s'appelle `routes/otherUser.js`, alors remplace la ligne ci-dessus par :
-// const otherUserRoutes = require('./routes/otherUser');
 /* =========================================================== */
 
 /* ===================== Routes publiques ===================== */
